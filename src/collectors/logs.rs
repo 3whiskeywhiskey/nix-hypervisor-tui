@@ -1,9 +1,9 @@
 use anyhow::{Result, Context};
 use crate::types::LogEntry;
 use std::collections::VecDeque;
-use std::process::{Command, Stdio};
+use std::process::Command;
 use std::io::{BufRead, BufReader};
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use chrono::{DateTime, Local};
 use regex::Regex;
 use once_cell::sync::Lazy;

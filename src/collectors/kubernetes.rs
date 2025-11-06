@@ -1,4 +1,4 @@
-use anyhow::{Result, Context};
+use anyhow::Result;
 use crate::types::{K8sClusterInfo, KubeVirtInfo};
 use kube::{Client, Api, config::{Config, KubeConfigOptions}};
 use k8s_openapi::api::core::v1::{Node, Pod, Service};
@@ -48,7 +48,7 @@ impl KubernetesCollector {
                     &KubeConfigOptions::default(),
                 )
                 .await?;
-                return Client::try_from(config);
+                return Ok(Client::try_from(config)?);
             }
         }
 
@@ -60,17 +60,17 @@ impl KubernetesCollector {
                 &KubeConfigOptions::default(),
             )
             .await?;
-            return Client::try_from(config);
+            return Ok(Client::try_from(config)?);
         }
 
         // Try in-cluster config (if running as pod)
         if let Ok(config) = Config::incluster() {
-            return Client::try_from(config);
+            return Ok(Client::try_from(config)?);
         }
 
         // Fall back to default kubeconfig
         let config = Config::infer().await?;
-        Client::try_from(config)
+        Ok(Client::try_from(config)?)
     }
 
     pub async fn collect_cluster_info(&self) -> Result<K8sClusterInfo> {

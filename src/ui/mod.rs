@@ -5,7 +5,7 @@ pub mod alerts;
 
 use ratatui::{
     layout::{Constraint, Direction, Layout, Rect},
-    style::{Color, Modifier, Style},
+    style::{Color, Style},
     text::{Line, Span},
     widgets::{Block, Borders, Paragraph},
     Frame,
@@ -36,7 +36,7 @@ pub fn draw(f: &mut Frame, app: &App) {
     let chunks = Layout::default()
         .direction(Direction::Vertical)
         .constraints(constraints)
-        .split(f.area());
+        .split(f.size());
 
     let mut chunk_idx = 0;
 
@@ -63,7 +63,7 @@ pub fn draw(f: &mut Frame, app: &App) {
 
     // Draw alert panel if in alert view mode
     if app.alert_panel_open {
-        alerts::draw_alert_panel(f, &active_alerts, f.area(), app.alert_selected_index);
+        alerts::draw_alert_panel(f, &active_alerts, f.size(), app.alert_selected_index);
     }
 }
 

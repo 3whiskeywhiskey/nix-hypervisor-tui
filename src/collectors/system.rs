@@ -1,6 +1,6 @@
 use anyhow::Result;
 use crate::types::SystemMetrics;
-use sysinfo::{System, SystemExt, CpuExt, DiskExt};
+use sysinfo::System;
 
 pub struct SystemCollector {
     sys: System,
@@ -24,7 +24,9 @@ impl SystemCollector {
         let used_memory = self.sys.used_memory() as f64 / 1_073_741_824.0;
 
         // Disk information (simplified - just root partition)
-        let (disk_read, disk_write, disk_usage) = if let Some(disk) = self.sys.disks().first() {
+        // Note: In sysinfo 0.30+, disks are handled separately via Disks type
+        let disks = sysinfo::Disks::new_with_refreshed_list();
+        let (disk_read, disk_write, disk_usage) = if let Some(disk) = disks.first() {
             let total = disk.total_space() as f64;
             let available = disk.available_space() as f64;
             let usage = ((total - available) / total * 100.0).max(0.0);
@@ -34,7 +36,7 @@ impl SystemCollector {
         };
 
         // Load average
-        let load_avg = self.sys.load_average().one;
+        let load_avg = System::load_average().one;
 
         Ok(SystemMetrics {
             cpu_usage,
