@@ -1,5 +1,7 @@
 mod app;
 mod collectors;
+mod config;
+mod metrics_history;
 mod types;
 mod ui;
 

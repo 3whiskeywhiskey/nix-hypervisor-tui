@@ -105,29 +105,63 @@ fn draw_disk(f: &mut Frame, app: &App, area: Rect) {
 }
 
 fn draw_cluster(f: &mut Frame, app: &App, area: Rect) {
+    let nodes_color = if app.k8s_info.nodes_ready == app.k8s_info.nodes_total && app.k8s_info.nodes_total > 0 {
+        Color::Green
+    } else if app.k8s_info.nodes_ready > 0 {
+        Color::Yellow
+    } else {
+        Color::Red
+    };
+
     let text = vec![
         Line::from(vec![
             Span::styled("Kubernetes Cluster", Style::default().fg(Color::Green)),
         ]),
         Line::from(vec![
             Span::styled("  Nodes: ", Style::default().fg(Color::Gray)),
-            Span::styled("3/3 Ready", Style::default().fg(Color::Green)),
+            Span::styled(
+                format!("{}/{} Ready", app.k8s_info.nodes_ready, app.k8s_info.nodes_total),
+                Style::default().fg(nodes_color)
+            ),
         ]),
         Line::from(vec![
             Span::styled("  Pods:  ", Style::default().fg(Color::Gray)),
-            Span::styled("45 Running", Style::default().fg(Color::Green)),
+            Span::styled(
+                format!("{} Running", app.k8s_info.pods_running),
+                Style::default().fg(Color::Green)
+            ),
+        ]),
+        Line::from(vec![
+            Span::styled("  Services: ", Style::default().fg(Color::Gray)),
+            Span::styled(
+                app.k8s_info.services.to_string(),
+                Style::default().fg(Color::Cyan)
+            ),
         ]),
         Line::from(""),
         Line::from(vec![
             Span::styled("KubeVirt VMs", Style::default().fg(Color::Green)),
         ]),
         Line::from(vec![
-            Span::styled("  Running: ", Style::default().fg(Color::Gray)),
-            Span::styled("12", Style::default().fg(Color::Green)),
+            Span::styled("  Running:   ", Style::default().fg(Color::Gray)),
+            Span::styled(
+                app.kubevirt_info.vms_running.to_string(),
+                Style::default().fg(Color::Green)
+            ),
         ]),
         Line::from(vec![
-            Span::styled("  Stopped: ", Style::default().fg(Color::Gray)),
-            Span::styled("3", Style::default().fg(Color::DarkGray)),
+            Span::styled("  Stopped:   ", Style::default().fg(Color::Gray)),
+            Span::styled(
+                app.kubevirt_info.vms_stopped.to_string(),
+                Style::default().fg(Color::DarkGray)
+            ),
+        ]),
+        Line::from(vec![
+            Span::styled("  Migrating: ", Style::default().fg(Color::Gray)),
+            Span::styled(
+                app.kubevirt_info.vms_migrating.to_string(),
+                Style::default().fg(Color::Yellow)
+            ),
         ]),
     ];
 
