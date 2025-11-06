@@ -1,4 +1,4 @@
-use anyhow::{Result, Context};
+use anyhow::Result;
 use crate::types::{K8sClusterInfo, KubeVirtInfo};
 use kube::{Client, Api, config::{Config, KubeConfigOptions}};
 use k8s_openapi::api::core::v1::{Node, Pod, Service};
