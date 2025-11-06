@@ -1,0 +1,48 @@
+# Hypervisor TUI Configuration Example
+
+[general]
+# Update interval in seconds
+refresh_interval = 2
+
+# Log buffer size (number of entries to keep)
+log_buffer_size = 10000
+
+[kubernetes]
+# Path to kubeconfig
+kubeconfig_path = "/etc/rancher/k3s/k3s.yaml"
+
+# Kubernetes API server (if not using kubeconfig)
+# api_server = "https://127.0.0.1:6443"
+
+[logging]
+# Services to monitor in logs
+services = [
+    "k3s",
+    "kubelet",
+    "containerd",
+    "virt-handler",
+    "virt-launcher",
+]
+
+# Log level filter (ERROR, WARN, INFO, DEBUG)
+level_filter = "INFO"
+
+[network]
+# Interfaces to monitor (empty = all)
+interfaces = []
+
+# Show bridge interfaces
+show_bridges = true
+
+# Show virtual interfaces
+show_virtual = true
+
+[display]
+# Color scheme (default, dark, light)
+theme = "default"
+
+# Show graphs/sparklines
+show_graphs = true
+
+# Refresh rate for animations (ms)
+animation_refresh = 100
