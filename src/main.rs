@@ -1,3 +1,4 @@
+mod alerts;
 mod app;
 mod collectors;
 mod config;
@@ -73,15 +74,29 @@ async fn run_app<B: ratatui::backend::Backend>(
         // Check for user input
         if event::poll(Duration::from_millis(100))? {
             if let Event::Key(key) = event::read()? {
-                match key.code {
-                    KeyCode::Char('q') | KeyCode::Esc => return Ok(()),
-                    KeyCode::F(1) => app.current_screen = Screen::Logs,
-                    KeyCode::F(2) => app.current_screen = Screen::Dashboard,
-                    KeyCode::F(3) => app.current_screen = Screen::Network,
-                    KeyCode::Up => app.scroll_up(),
-                    KeyCode::Down => app.scroll_down(),
-                    KeyCode::Char('r') => app.refresh().await?,
-                    _ => {}
+                // Handle alert panel navigation if open
+                if app.alert_panel_open {
+                    match key.code {
+                        KeyCode::Esc => app.toggle_alert_panel(),
+                        KeyCode::Up => app.alert_navigate_up(),
+                        KeyCode::Down => app.alert_navigate_down(),
+                        KeyCode::Char('d') => app.dismiss_selected_alert(),
+                        KeyCode::Char('D') => app.dismiss_all_alerts(),
+                        _ => {}
+                    }
+                } else {
+                    // Normal navigation
+                    match key.code {
+                        KeyCode::Char('q') | KeyCode::Esc => return Ok(()),
+                        KeyCode::F(1) => app.current_screen = Screen::Logs,
+                        KeyCode::F(2) => app.current_screen = Screen::Dashboard,
+                        KeyCode::F(3) => app.current_screen = Screen::Network,
+                        KeyCode::Up => app.scroll_up(),
+                        KeyCode::Down => app.scroll_down(),
+                        KeyCode::Char('a') => app.toggle_alert_panel(),
+                        KeyCode::Char('r') => app.refresh().await?,
+                        _ => {}
+                    }
                 }
             }
         }

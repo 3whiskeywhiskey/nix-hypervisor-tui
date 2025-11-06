@@ -19,6 +19,9 @@ pub struct Config {
 
     #[serde(default)]
     pub display: DisplayConfig,
+
+    #[serde(default)]
+    pub alerts: AlertsConfig,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -72,6 +75,42 @@ pub struct DisplayConfig {
     pub animation_refresh: u64,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AlertsConfig {
+    #[serde(default = "default_true")]
+    pub enabled: bool,
+
+    #[serde(default = "default_cpu_warning")]
+    pub cpu_warning_threshold: f64,
+
+    #[serde(default = "default_cpu_critical")]
+    pub cpu_critical_threshold: f64,
+
+    #[serde(default = "default_memory_warning")]
+    pub memory_warning_threshold: f64,
+
+    #[serde(default = "default_memory_critical")]
+    pub memory_critical_threshold: f64,
+
+    #[serde(default = "default_disk_warning")]
+    pub disk_warning_threshold: f64,
+
+    #[serde(default = "default_disk_critical")]
+    pub disk_critical_threshold: f64,
+
+    #[serde(default = "default_load_warning")]
+    pub load_warning_threshold: f64,
+
+    #[serde(default = "default_load_critical")]
+    pub load_critical_threshold: f64,
+
+    #[serde(default = "default_true")]
+    pub kubernetes_enabled: bool,
+
+    #[serde(default = "default_true")]
+    pub kubevirt_enabled: bool,
+}
+
 impl Default for Config {
     fn default() -> Self {
         Self {
@@ -80,6 +119,7 @@ impl Default for Config {
             logging: LoggingConfig::default(),
             network: NetworkConfig::default(),
             display: DisplayConfig::default(),
+            alerts: AlertsConfig::default(),
         }
     }
 }
@@ -131,6 +171,24 @@ impl Default for DisplayConfig {
     }
 }
 
+impl Default for AlertsConfig {
+    fn default() -> Self {
+        Self {
+            enabled: true,
+            cpu_warning_threshold: default_cpu_warning(),
+            cpu_critical_threshold: default_cpu_critical(),
+            memory_warning_threshold: default_memory_warning(),
+            memory_critical_threshold: default_memory_critical(),
+            disk_warning_threshold: default_disk_warning(),
+            disk_critical_threshold: default_disk_critical(),
+            load_warning_threshold: default_load_warning(),
+            load_critical_threshold: default_load_critical(),
+            kubernetes_enabled: true,
+            kubevirt_enabled: true,
+        }
+    }
+}
+
 // Default value functions
 fn default_refresh_interval() -> u64 { 2 }
 fn default_log_buffer_size() -> usize { 10000 }
@@ -139,6 +197,16 @@ fn default_level_filter() -> String { "INFO".to_string() }
 fn default_theme() -> String { "default".to_string() }
 fn default_animation_refresh() -> u64 { 100 }
 fn default_true() -> bool { true }
+
+// Alert thresholds
+fn default_cpu_warning() -> f64 { 80.0 }
+fn default_cpu_critical() -> f64 { 95.0 }
+fn default_memory_warning() -> f64 { 85.0 }
+fn default_memory_critical() -> f64 { 95.0 }
+fn default_disk_warning() -> f64 { 85.0 }
+fn default_disk_critical() -> f64 { 95.0 }
+fn default_load_warning() -> f64 { 10.0 }
+fn default_load_critical() -> f64 { 20.0 }
 
 fn default_services() -> Vec<String> {
     vec![

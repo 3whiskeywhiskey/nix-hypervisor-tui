@@ -46,3 +46,29 @@ show_graphs = true
 
 # Refresh rate for animations (ms)
 animation_refresh = 100
+
+[alerts]
+# Enable/disable alert system
+enabled = true
+
+# CPU thresholds (percentage)
+cpu_warning_threshold = 80.0
+cpu_critical_threshold = 95.0
+
+# Memory thresholds (percentage)
+memory_warning_threshold = 85.0
+memory_critical_threshold = 95.0
+
+# Disk thresholds (percentage)
+disk_warning_threshold = 85.0
+disk_critical_threshold = 95.0
+
+# Load average thresholds
+load_warning_threshold = 10.0
+load_critical_threshold = 20.0
+
+# Enable Kubernetes alerts
+kubernetes_enabled = true
+
+# Enable KubeVirt alerts
+kubevirt_enabled = true

@@ -1,6 +1,7 @@
 mod logs;
 mod dashboard;
 mod network;
+pub mod alerts;
 
 use ratatui::{
     layout::{Constraint, Direction, Layout, Rect},
@@ -13,27 +14,57 @@ use ratatui::{
 use crate::app::{App, Screen};
 
 pub fn draw(f: &mut Frame, app: &App) {
-    let chunks = Layout::default()
-        .direction(Direction::Vertical)
-        .constraints([
+    // Check if we have active alerts
+    let active_alerts = app.alert_manager.get_active_alerts();
+    let has_alerts = !active_alerts.is_empty();
+
+    let constraints = if has_alerts {
+        vec![
+            Constraint::Length(1),  // Alert banner
             Constraint::Length(3),  // Header
             Constraint::Min(0),     // Content
             Constraint::Length(1),  // Footer
-        ])
+        ]
+    } else {
+        vec![
+            Constraint::Length(3),  // Header
+            Constraint::Min(0),     // Content
+            Constraint::Length(1),  // Footer
+        ]
+    };
+
+    let chunks = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints(constraints)
         .split(f.area());
 
+    let mut chunk_idx = 0;
+
+    // Draw alert banner if there are active alerts
+    if has_alerts {
+        alerts::draw_alert_banner(f, &active_alerts, chunks[chunk_idx]);
+        chunk_idx += 1;
+    }
+
     // Draw header
-    draw_header(f, app, chunks[0]);
+    draw_header(f, app, chunks[chunk_idx]);
+    chunk_idx += 1;
 
     // Draw content based on current screen
     match app.current_screen {
-        Screen::Logs => logs::draw(f, app, chunks[1]),
-        Screen::Dashboard => dashboard::draw(f, app, chunks[1]),
-        Screen::Network => network::draw(f, app, chunks[1]),
+        Screen::Logs => logs::draw(f, app, chunks[chunk_idx]),
+        Screen::Dashboard => dashboard::draw(f, app, chunks[chunk_idx]),
+        Screen::Network => network::draw(f, app, chunks[chunk_idx]),
     }
+    chunk_idx += 1;
 
     // Draw footer
-    draw_footer(f, app, chunks[2]);
+    draw_footer(f, app, chunks[chunk_idx]);
+
+    // Draw alert panel if in alert view mode
+    if app.alert_panel_open {
+        alerts::draw_alert_panel(f, &active_alerts, f.area(), app.alert_selected_index);
+    }
 }
 
 fn draw_header(f: &mut Frame, app: &App, area: Rect) {
@@ -102,6 +133,8 @@ fn draw_footer(f: &mut Frame, app: &App, area: Rect) {
         ),
         Span::raw("  "),
         Span::styled("↑↓: Scroll", Style::default().fg(Color::DarkGray)),
+        Span::raw("  "),
+        Span::styled("a: Alerts", Style::default().fg(Color::DarkGray)),
         Span::raw("  "),
         Span::styled("r: Refresh", Style::default().fg(Color::DarkGray)),
         Span::raw("  "),
